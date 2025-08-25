@@ -206,11 +206,11 @@ void loop()
           }else // si no tiene exito la carga
           {
             lcd1.clear();
-            lcd1.setCursor(6,0);
+            lcd1.setCursor(5,0);
             lcd1.print("MISIL");
     		    lcd1.setCursor(2,1);
     		    lcd1.print("DESCONECTADO");
-            delay(2000);
+            delay(1000);
             lcd1.clear();
             break;
           }
@@ -226,7 +226,7 @@ void loop()
     lcd1.print("MISIL");
   }
 
-  //Carburante
+  //Combustible
   if(digitalRead(comb)==1 && d==true && m==false) //si está en hight y es true
   { 
     tiempo=millis();
@@ -236,7 +236,7 @@ void loop()
       lcd1.setCursor(3,0);
       lcd1.print("DETECTANDO");
       lcd1.setCursor(2,1);
-      lcd1.print("COMBUSTIBLE.");  
+      lcd1.print("COMBUSTIBLE");  
       if(millis()-tiempo>=T_max) //condición tiempo
       {
       	lcd1.clear();
@@ -255,9 +255,9 @@ void loop()
               {
                delay(500);
                lcd1.clear();
-               lcd1.setCursor(2,0);
+               lcd1.setCursor(3,0);
                lcd1.print("COMBUSTIBLE");
-               lcd1.setCursor(3,1);
+               lcd1.setCursor(4,1);
                lcd1.print("CONECTADO");
                delay(2000);
                lcd1.clear();
@@ -268,8 +268,8 @@ void loop()
             lcd1.setCursor(3,0);
             lcd1.print("COMBUSTIBLE");
     		    lcd1.setCursor(2,1);
-    		    lcd1.print("DESCONECTADO.");
-            delay(2000);
+    		    lcd1.print("DESCONECTADO");
+            delay(1000);
       		  lcd1.clear();	
             break;
           }
@@ -278,9 +278,9 @@ void loop()
     }   
   }else if (digitalRead(comb)==0 && d==true && m==false) //esperando la conexión
   {
-  	lcd1.setCursor(3,0);
+  	lcd1.setCursor(4,0);
     lcd1.print("ESPERANDO");
-    lcd1.setCursor(2,1);
+    lcd1.setCursor(3,1);
     lcd1.print("COMBUSTIBLE");
   }
 
@@ -327,7 +327,7 @@ void loop()
             lcd1.print("CHIP");
     		    lcd1.setCursor(2,1);
     		    lcd1.print("DESCONECTADO");
-            delay(2000);
+            delay(1000);
       		  lcd1.clear();	
             break;
           }
@@ -345,6 +345,8 @@ void loop()
    //lanzadera
   if(digitalRead(misil)==1 && digitalRead(comb)==1 && digitalRead(chip)==1 && m==false && d==false && c==false )
   {
+    motor(); //da corriente a la lanzadera - se enciende motor
+
     if(digitalRead(lanzadera)==1 && l==true) //tope lanzadera alcanzado
     {
       lcd1.clear();
@@ -363,9 +365,8 @@ void loop()
     {
       lcd1.setCursor(5,0);
       lcd1.print("ELEVAR");
-      lcd1.setCursor(3,1);
+      lcd1.setCursor(4,1);
       lcd1.print("LANZADERA");
-      motor(); //da corriente a la lanzadera - se enciende motor
     } 
     
   }else if(digitalRead(misil)==0 && m==false)//si misil se apaga
@@ -410,27 +411,28 @@ void sonido()//tono
 void F_regresiva()
 {
   lcd1.clear();
-  for(int i=0; i <= 10; i++)
+  for(int i=0; i <= 5; i++)
   {
     lcd1.setCursor(3,0);
     lcd1.print("CUENTA ATRAS");
     lcd1.setCursor(7,1);
-    lcd1.print(10-i);
+    lcd1.print("0");
+    lcd1.setCursor(8,1);
+    lcd1.print(5-i);
     delay(1000);
-    lcd1.clear();
     
-    if(i==10)
+    if(i==5)
     {
       if(digitalRead(misil)==1 && digitalRead(comb)==1 && digitalRead(chip)==1 && digitalRead(lanzadera)==1)
       {
         lcd1.clear();
         sonido();
         digitalWrite(fuego,HIGH);
-        while(i==10)
+        while(i==5)
         {
-          lcd1.setCursor(4,0);
+          lcd1.setCursor(5,0);
           lcd1.print("MISIL");
-          lcd1.setCursor(3,1);
+          lcd1.setCursor(4,1);
           lcd1.print("LANZADO");
         }
       }
@@ -445,7 +447,7 @@ void F_regresiva()
 
 void motor()
 {
-  if(m==false && d==false && c==false && l==true)//corriente lanzadera 
+  if(m,d,c == false && l==true)//corriente lanzadera 
   {
     digitalWrite(led_motor,HIGH);
   }
@@ -455,7 +457,6 @@ void motor()
   }     
 }
 
-//CODIGO ACTIVACION
 void code()
 {
   lcd1.setCursor(0,0);
@@ -485,77 +486,63 @@ void code()
           lcd1.print("*");
         }
           
-        if(cont==5)
-        {
-          if(codigo[4]==valor[0])
-          {  
-            if(codigo[0]==contrasena[0]&&codigo[1]==contrasena[1]&&codigo[2]==contrasena[2]&&codigo[3]==contrasena[3])  
-            {
-              lcd1.clear();
-              lcd1.setCursor(0,0);
-              lcd1.print("CODIGO:");
-              lcd1.setCursor(0,1);
-              lcd1.print("CORRECTO");
-              delay(1500);
-              lcd1.clear();
-              lcd1.setCursor(4,0);
-              lcd1.print("SISTEMA");
-              lcd1.setCursor(3,1);
-              lcd1.print("ACTIVADO");
-              delay(1500);
-              lcd1.clear();
-              lcd1.setCursor(5,0);
-              lcd1.print("ESPERANDO");
-              lcd1.setCursor(3,1);
-              lcd1.print("LANZAMIENTO");
-              delay(1500);
-              activo=false;
-            }
-            else
-            {
-              lcd1.clear();
-              lcd1.setCursor(0,0);
-              lcd1.print("CODIGO:");
-              lcd1.setCursor(0,1);
-              lcd1.print("INCORRECTO");
-              delay(2000);
-              lcd1.clear();
-              cont=0;
-              n++;
-                
-              if(n==3)
-              {
-                lcd1.setCursor(4,0);
-                lcd1.print("SISTEMA");
-                lcd1.setCursor(3,1);
-                lcd1.print("BROQUEADO");
-              }  
-            }
+        if(cont==4)
+        { 
+          if(codigo[0]==contrasena[0]&&codigo[1]==contrasena[1]&&codigo[2]==contrasena[2]&&codigo[3]==contrasena[3])  
+          {
+            lcd1.clear();
+            lcd1.setCursor(0,0);
+            lcd1.print("CODIGO:");
+            lcd1.setCursor(0,1);
+            lcd1.print("CORRECTO");
+            delay(1500);
+            lcd1.clear();
+            lcd1.setCursor(4,0);
+            lcd1.print("SISTEMA");
+            lcd1.setCursor(3,1);
+            lcd1.print("ACTIVADO");
+            delay(1500);
+            lcd1.clear();
+            lcd1.setCursor(4,0);
+            lcd1.print("ESPERANDO");
+            lcd1.setCursor(3,1);
+            lcd1.print("LANZAMIENTO");
+            delay(1500);
+            activo=false;
           }
           else
           {
-            cont=4;
-          }  
+            lcd1.clear();
+            lcd1.setCursor(0,0);
+            lcd1.print("CODIGO:");
+            lcd1.setCursor(0,1);
+            lcd1.print("INCORRECTO");
+            delay(2000);
+            lcd1.clear();
+            cont=0;
+            n++;
+              
+            if(n==3)
+            {
+              lcd1.setCursor(4,0);
+              lcd1.print("SISTEMA");
+              lcd1.setCursor(3,1);
+              lcd1.print("BROQUEADO");
+            }  
+          }
         }   
       }
     }
-    else if(digitalRead(misil)==0 || digitalRead(comb)==0 || digitalRead(chip)==0) //si durante el proceso se desconecta alguno de los 3 interuptores
+    else //si durante el proceso se desconecta alguno de los 4 interuptores
     {
       l=true;
-      motor();
       lcd1.clear();
       break;
     }
-   else if(digitalRead(lanzadera)==0) //si durante el proceso se desconecta la lanzadera
-   {
-      l=true;
-      lcd1.clear();
-      break;
-   }
   }  
 }
 
-//Establecer codigo 
+//establecer codigo 
 void establecer_clave()
 {
   lcd1.setCursor(4,0);
@@ -594,7 +581,7 @@ void establecer_clave()
           lcd1.setCursor(0,0);
           lcd1.print("CONFIRMAR CODIGO");
           lcd1.setCursor(0,1);
-          lcd1.print("NO * / SI #");
+          lcd1.print("si # / no *");
         }
         
         cont=cont+1;
@@ -610,22 +597,23 @@ void establecer_clave()
           lcd1.print("CONFIRMADO");
           delay(2000);
           lcd1.clear();
+          cont=0;
           break;
         }
         else if(contrasena[4]==valor1[0])
         {
           lcd1.clear();
-          lcd1.setCursor(5,0);
+          lcd1.setCursor(0,0);
           lcd1.print("PRUEBA");
-          lcd1.setCursor(4,1);
+          lcd1.setCursor(0,1);
           lcd1.print("OTRA VEZ");
           cont=0;
           delay(1000);
           lcd1.clear();
         }
-        else if(contrasena[4]!=valor[0] && contrasena[4]!=valor1[0])
+        else if(contrasena[5]!=valor[0] && contrasena[5]!=valor1[0])
         {
-          cont=3;
+          cont=5;
         }  
       }
     } 
@@ -698,7 +686,7 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
     lcd1.setCursor(4,0);
     lcd1.print("LANZADERA");
     lcd1.setCursor(2,1);
-    lcd1.print("DESCONECTADO");
+    lcd1.print("DESCONECTADA");
   }
 
   while(true);
