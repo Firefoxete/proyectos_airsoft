@@ -1,8 +1,16 @@
 #include <Wire.h>
+//libreria teclado
 #include <Keypad.h>
+//libreria pantalla
 #include <LiquidCrystal_I2C.h>
+//libreria dfplayer
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
 
-LiquidCrystal_I2C lcd1(0x20,16,2); // Dirección de la pantalla uno
+LiquidCrystal_I2C lcd1(0x27,16,2); // Dirección de la pantalla uno
+
+SoftwareSerial DFPlayerSerial(A0,A1);
+DFRobotDFPlayerMini myDFPlayer;
 
 // Definir los pines del teclado
 const byte FILAS = 4; // Número de filas
@@ -17,7 +25,7 @@ const byte teclado[FILAS][COLUMNAS] = {
 };
 
 byte pinFilas[FILAS] = {9, 8, 7, 6}; // Pines de las filas (salidas)
-byte pinColumnas[COLUMNAS] = {5, 4, 3, 2}; // Pines de las columnas (entradas)
+byte pinColumnas[COLUMNAS] = {5, 4, 3}; // Pines de las columnas (entradas)
 
 Keypad teclado1 = Keypad( makeKeymap(teclado), pinFilas, pinColumnas, FILAS, COLUMNAS); 
 
@@ -95,7 +103,7 @@ int led_motor = 13;
 int fuego = A3;
 int lanzadera = A2;
 int Altavoz = A1;
-int boton = A0;
+int boton = 2;
 //variables de tiempo
 unsigned long tiempo = 0;
 unsigned long T_max = 300;
@@ -134,6 +142,10 @@ void setup()
   
  
   Serial.begin(9600);
+
+  DFPlayerSerial.begin(9600);
+  myDFPlayer.begin(DFPlayerSerial);
+  myDFPlayer.volume(20);
   
   lcd1.init();
   lcd1.backlight();
