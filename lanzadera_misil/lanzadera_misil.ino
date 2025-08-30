@@ -106,7 +106,7 @@ int Altavoz = A1;
 int boton = 2;
 //variables de tiempo
 unsigned long tiempo = 0;
-unsigned long T_max = 300;
+unsigned long T_max = 2000;
 //variables estado
 boolean m = true; //misil
 boolean d = true; //deposito
@@ -189,7 +189,7 @@ void loop()
       lcd1.setCursor(3,0);
       lcd1.print("DETECTANDO");
       lcd1.setCursor(5,1);
-      lcd1.print("MISIL");  
+      lcd1.print("MISIL");
       if(millis()-tiempo>=T_max) //condición tiempo
       {
       	lcd1.clear();
@@ -203,10 +203,11 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
+            delay(1000);
             BarraDeCarga(i, 100, 1, false);
               if(i==100) //si tiene exito la carga
               {
-               delay(500);
+               delay(1000);
                lcd1.clear();
                lcd1.setCursor(5,0);
                lcd1.print("MISIL");
@@ -262,10 +263,11 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
+            delay(1000);
             BarraDeCarga(i, 100, 1, false);
               if(i==100) //si tiene exito la carga
               {
-               delay(500);
+               delay(1000);
                lcd1.clear();
                lcd1.setCursor(3,0);
                lcd1.print("COMBUSTIBLE");
@@ -320,10 +322,11 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
+            delay(1000);
             BarraDeCarga(i, 100, 1, false);
               if(i==100) //si tiene exito la carga
               {
-               delay(500);
+               delay(1000);
                lcd1.clear();
                lcd1.setCursor(6,0);
                lcd1.print("CHIP");
@@ -637,7 +640,7 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
  {
     if(count<100)
     {
-      double factor = totalCount/80.0;  
+      double factor = totalCount/75.0;  
       int percent = (count+1)/factor;
       int number = percent/5;
       int remainder = percent%5;
