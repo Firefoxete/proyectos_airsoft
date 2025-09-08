@@ -9,7 +9,7 @@
 
 LiquidCrystal_I2C lcd1(0x27,16,2); // Dirección de la pantalla uno
 
-SoftwareSerial DFPlayerSerial(A0,A1);
+SoftwareSerial mySoftwareSerial(A0,A1); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
 // Definir los pines del teclado
@@ -94,13 +94,12 @@ byte J[8] = {
 };
 
 //varibles de conexiones
-int misil = 10;
+int misil = 00;
 int comb = 11;
 int chip = 12;
 int led_motor = 13;
 int fuego = A3;
 int lanzadera = A2;
-int Altavoz = A1;
 int boton = 2;
 //variables de tiempo
 unsigned long tiempo = 0;
@@ -134,20 +133,19 @@ void setup()
   pinMode(comb, INPUT);
   pinMode(lanzadera, INPUT);
   pinMode(fuego, OUTPUT);
-  pinMode(Altavoz, OUTPUT);
   pinMode(led_motor, OUTPUT);
   pinMode(boton,INPUT_PULLUP);
   
  
   Serial.begin(9600);
 
-  DFPlayerSerial.begin(9600);
-  myDFPlayer.begin(DFPlayerSerial);
+  mySoftwareSerial.begin(115200);
+  myDFPlayer.begin(mySoftwareSerial);
   myDFPlayer.volume(20);
   
   lcd1.init();
   lcd1.backlight();
-  myDFPlayer.play(29);
+  myDFPlayer.play(1);
 
   //establece código de activación
     establecer_clave();
