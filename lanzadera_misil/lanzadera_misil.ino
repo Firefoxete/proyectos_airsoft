@@ -94,7 +94,7 @@ byte J[8] = {
 };
 
 //varibles de conexiones
-int misil = 00;
+int misil = 10;
 int comb = 11;
 int chip = 12;
 int led_motor = 13;
@@ -121,6 +121,9 @@ bool activo=true;
 
 void setup()
 {
+  lcd1.init();
+  lcd1.backlight();
+
   lcd1.createChar(0, A);
   lcd1.createChar(1, B);
   lcd1.createChar(2, C);
@@ -136,26 +139,35 @@ void setup()
   pinMode(led_motor, OUTPUT);
   pinMode(boton,INPUT_PULLUP);
   
- 
   Serial.begin(9600);
-
-  mySoftwareSerial.begin(115200);
-  myDFPlayer.begin(mySoftwareSerial);
-  myDFPlayer.volume(20);
   
-  lcd1.init();
-  lcd1.backlight();
-  myDFPlayer.play(1);
+  mySoftwareSerial.begin(9600);
+  Serial.begin(115200);
 
+  //comprueba si el dfplayer está conectado
+  Serial.println();
+  Serial.println(F("DFRobot DFPlayer Mini Demo"));
+  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
+  if (!myDFPlayer.begin(mySoftwareSerial)) { 
+    Serial.println(F("Unable to begin:"));
+    Serial.println(F("1.Please recheck the connection!"));
+    Serial.println(F("2.Please insert the SD card!"));
+    while(true);
+  }
+
+  myDFPlayer.volume(20);
+ 
   //establece código de activación
-    establecer_clave();
+    myDFPlayer.play(9);
+    delay(1000);
+    establecer_clave();//establece la clave activación de cada partida.
  
   lcd1.setCursor(3,0);
   lcd1.print("TERCIO GRT");
   lcd1.setCursor(4,1);
   lcd1.print("AIRSOFT");
 
-  delay(1000);
+  delay(1500);
   lcd1.clear();
 
   lcd1.setCursor(2,0);
@@ -163,11 +175,11 @@ void setup()
   lcd1.setCursor(0,1);
   lcd1.print("...DE MISILES...");
 
-  delay(500);
+  delay(1000);
   
   for(int i=0;i<=38;i++){
     lcd1.scrollDisplayRight();
-    delay(100);
+    delay(150);
   }
   delay(1500);
   lcd1.clear();
@@ -178,11 +190,14 @@ void loop()
   //código para misil
   if(digitalRead(misil)==1 && m==true) //si está en hight y es true
   { 
+    myDFPlayer.play(1);
+    delay(500);
+    
     tiempo=millis();
     lcd1.clear();
+    
     while(digitalRead(misil)==1 && m==true) //bucle de carga
     {
-      myDFPlayer.play(1);
       lcd1.setCursor(3,0);
       lcd1.print("DETECTANDO");
       lcd1.setCursor(5,1);
@@ -199,28 +214,27 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
-            delay(1000);
-            BarraDeCarga(i, 100, 1, false);
+            delay(50);
+            BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
-               delay(1000);
-               //myDFPlayer.play(2);
                lcd1.clear();
                lcd1.setCursor(5,0);
                lcd1.print("MISIL");
                lcd1.setCursor(3,1);
                lcd1.print("CONECTADO");
+               myDFPlayer.play(2);
                delay(2000);
                lcd1.clear(); 
               }
           }else // si no tiene exito la carga
           {
             lcd1.clear();
-            myDFPlayer.play(3);
             lcd1.setCursor(5,0);
             lcd1.print("MISIL");
     		    lcd1.setCursor(2,1);
     		    lcd1.print("DESCONECTADO");
+            myDFPlayer.play(3);
             delay(1000);
             lcd1.clear();
             break;
@@ -232,20 +246,27 @@ void loop()
   }else if (digitalRead(misil)==0 && m==true) //esperando la conexión
   {
     myDFPlayer.play(4);
-  	lcd1.setCursor(3,0);
-    lcd1.print("ESPERANDO");
-    lcd1.setCursor(5,1);
-    lcd1.print("MISIL");
+    delay(500);
+  	while(digitalRead(misil)==0 && m==true)
+    {
+      lcd1.setCursor(3,0);
+      lcd1.print("ESPERANDO");
+      lcd1.setCursor(5,1);
+      lcd1.print("MISIL");
+    }
   }
 
   //Combustible
-  if(digitalRead(comb)==1 && d==true && m==false) //si está en hight y es true
+  if(digitalRead(comb)==1 && digitalRead(misil)==1 && d==true && m==false) //si está en hight y es true
   { 
+    myDFPlayer.play(11);
+    delay(500);
+    
     tiempo=millis();
     lcd1.clear();
-    while(digitalRead(comb)==1 && d==true && m==false) //bucle de carga
+    
+    while(digitalRead(comb)==1 && digitalRead(misil)==1 && d==true && m==false) //bucle de carga
     {
-      myDFPlayer.play(5);
       lcd1.setCursor(3,0);
       lcd1.print("DETECTANDO");
       lcd1.setCursor(2,1);
@@ -263,28 +284,27 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
-            delay(1000);
-            BarraDeCarga(i, 100, 1, false);
+            delay(50);
+            BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
-               delay(1000);
-               //myDFPlayer.play(6);
                lcd1.clear();
                lcd1.setCursor(3,0);
                lcd1.print("COMBUSTIBLE");
                lcd1.setCursor(4,1);
                lcd1.print("CONECTADO");
+               myDFPlayer.play(12);
                delay(2000);
                lcd1.clear();
               }
           }else // si no tiene exito la carga
           {
             lcd1.clear();
-            myDFPlayer.play(7);
             lcd1.setCursor(3,0);
             lcd1.print("COMBUSTIBLE");
     		    lcd1.setCursor(2,1);
     		    lcd1.print("DESCONECTADO");
+            myDFPlayer.play(13);
             delay(1000);
       		  lcd1.clear();	
             break;
@@ -292,23 +312,30 @@ void loop()
       	}
       }
     }   
-  }else if (digitalRead(comb)==0 && d==true && m==false) //esperando la conexión
+  }else if (digitalRead(comb)==0 && digitalRead(misil)==1 && d==true && m==false) //esperando la conexión
   {
-    myDFPlayer.play(8);
-  	lcd1.setCursor(4,0);
-    lcd1.print("ESPERANDO");
-    lcd1.setCursor(3,1);
-    lcd1.print("COMBUSTIBLE");
+    myDFPlayer.play(14);
+    delay(500);
+  	while(digitalRead(comb)==0 && digitalRead(misil)==1 && d==true && m==false)
+    {
+      lcd1.setCursor(4,0);
+      lcd1.print("ESPERANDO");
+      lcd1.setCursor(3,1);
+      lcd1.print("COMBUSTIBLE");
+    }
   }
 
   //chip
-  if(digitalRead(chip)==1 && c==true && d==false && m==false) //si está en hight y es true
+  if(digitalRead(chip)==1 && digitalRead(comb)==1 && digitalRead(misil)==1 && c==true && d==false && m==false) //si está en hight y es true
   { 
+    myDFPlayer.play(15);
+    delay(500);
+    
     tiempo=millis();
     lcd1.clear();
-    while(digitalRead(chip)==1 && c==true && d==false && m==false) //bucle de carga
+    
+    while(digitalRead(chip)==1 && digitalRead(comb)==1 && digitalRead(misil)==1 && c==true && d==false && m==false) //bucle de carga
     {
-      myDFPlayer.play(9);
       lcd1.setCursor(4,0);
       lcd1.print("DETECTADO");
       lcd1.setCursor(6,1);
@@ -326,28 +353,27 @@ void loop()
             lcd1.print("%");
             lcd1.setCursor(5,0);
             lcd1.print("CARGANDO...");
-            delay(1000);
-            BarraDeCarga(i, 100, 1, false);
+            delay(50);
+            BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
-               delay(1000);
-               myDFPlayer.play(10);
                lcd1.clear();
                lcd1.setCursor(6,0);
                lcd1.print("CHIP");
                lcd1.setCursor(4,1);
                lcd1.print("CONECTADO");
+               myDFPlayer.play(16);
                delay(2000);
                lcd1.clear(); 
               }
           }else // si no tiene exito la carga
           {
             lcd1.clear();
-            myDFPlayer.play(11);
             lcd1.setCursor(6,0);
             lcd1.print("CHIP");
     		    lcd1.setCursor(2,1);
     		    lcd1.print("DESCONECTADO");
+            myDFPlayer.play(17);
             delay(1000);
       		  lcd1.clear();	
             break;
@@ -355,13 +381,17 @@ void loop()
       	}
       }
     }   
-  }else if (digitalRead(chip)==0 && c==true && d==false && m==false) //esperando la conexión
+  }else if (digitalRead(chip)==0 && digitalRead(comb)==1 && digitalRead(misil)==1 && c==true && d==false && m==false) //esperando la conexión
   {
-    myDFPlayer.play(11);
-  	lcd1.setCursor(4,0);
-    lcd1.print("ESPERANDO");
-    lcd1.setCursor(6,1);
-    lcd1.print("CHIP");
+    myDFPlayer.play(18);
+  	delay(500);
+    while(digitalRead(chip)==0 && digitalRead(comb)==1 && digitalRead(misil)==1 && c==true && d==false && m==false)
+    {
+      lcd1.setCursor(4,0);
+      lcd1.print("ESPERANDO");
+      lcd1.setCursor(6,1);
+      lcd1.print("CHIP");
+    }
   }
 
    //lanzadera
@@ -371,41 +401,71 @@ void loop()
 
     if(digitalRead(lanzadera)==1 && l==true) //tope lanzadera alcanzado
     {
-      myDFPlayer.play(13);
       lcd1.clear();
       lcd1.setCursor(4,0);
       lcd1.print("LANZADERA");
       lcd1.setCursor(3,1);
       lcd1.print("EN POSICION");
+      myDFPlayer.play(19);
+      delay(2000);
+
       l=false;
       motor();// motor se apaga
-      delay(1000);
       lcd1.clear();
       
       code(); //debes introducir condigo activación
     }
     else if(digitalRead(lanzadera)==0 && l==true) //tope no alcanzado
     {
-      myDFPlayer.play(14);
-      lcd1.setCursor(5,0);
-      lcd1.print("ELEVAR");
-      lcd1.setCursor(4,1);
-      lcd1.print("LANZADERA");
+      myDFPlayer.play(20);
+      delay(1500);
+      
+      while(digitalRead(lanzadera)==0 && l==true)
+      {
+        lcd1.setCursor(5,0);
+        lcd1.print("ELEVAR");
+        lcd1.setCursor(4,1);
+        lcd1.print("LANZADERA");
+      }
     } 
     
   }else if(digitalRead(misil)==0 && m==false)//si misil se apaga
   {
     lcd1.clear();
+    lcd1.setCursor(5,0);
+    lcd1.print("MISIL");
+    lcd1.setCursor(2,1);
+    lcd1.print("DESCONECTADO");
+    myDFPlayer.play(3);
+    delay(2000);
+    lcd1.clear();
+
     m=true; 
     motor(); //apaga motor
   }else if(digitalRead(comb)==0 && d==false)//si combustible se apaga
   {
     lcd1.clear();
+    lcd1.setCursor(3,0);
+    lcd1.print("COMBUSTIBLE");
+    lcd1.setCursor(2,1);
+    lcd1.print("DESCONECTADO");
+    myDFPlayer.play(13);
+    delay(2000);
+    lcd1.clear();
+
     d=true;
     motor(); //apaga motor
   }else if(digitalRead(chip)==0 && c==false)//si chip se apaga
   { 
     lcd1.clear();
+    lcd1.setCursor(6,0);
+    lcd1.print("CHIP");
+    lcd1.setCursor(2,1);
+    lcd1.print("DESCONECTADO");
+    myDFPlayer.play(17);
+    delay(2000);
+    lcd1.clear();
+
     c=true;
     motor(); //apaga motor
   }
@@ -426,10 +486,13 @@ void loop()
 //Funciones
 void F_regresiva()
 {
+
   lcd1.clear();
+  myDFPlayer.play(21);
+  delay(1000);
+  
   for(int i=0; i <= 10; i++)
   {
-    myDFPlayer.play(15);
     lcd1.setCursor(3,0);
     lcd1.print("CUENTA ATRAS");
     if(i==0)
@@ -444,6 +507,7 @@ void F_regresiva()
       lcd1.setCursor(8,1);
       lcd1.print(10-i);
     }
+    myDFPlayer.play(30);
     delay(1000);
 
     if(i==10)
@@ -452,13 +516,17 @@ void F_regresiva()
       {
         lcd1.clear();
         digitalWrite(fuego,HIGH);
-        while(i==10)
+        if(i==10)
         {
-          myDFPlayer.play(16);
-          lcd1.setCursor(5,0);
-          lcd1.print("MISIL");
-          lcd1.setCursor(4,1);
-          lcd1.print("LANZADO");
+          myDFPlayer.play(22);
+          delay(500);
+          while(i==10)
+          {
+            lcd1.setCursor(5,0);
+            lcd1.print("MISIL");
+            lcd1.setCursor(4,1);
+            lcd1.print("LANZADO");
+          }
         }
       }
       else
@@ -484,11 +552,11 @@ void motor()
 
 void code()
 {
-  myDFPlayer.play(17);
   lcd1.setCursor(0,0);
   lcd1.print("INTRODUCE CODIGO");
   lcd1.setCursor(2,1);
   lcd1.print("DE ACTIVACION");
+  myDFPlayer.play(23);
   delay(2000);
   lcd1.clear();
   
@@ -503,6 +571,8 @@ void code()
         
       if (tecla_presionada!= NO_KEY) 
       {
+        myDFPlayer.play(10);
+        delay(1000);
         codigo[cont]=tecla_presionada;
         cont=cont+1;
           
@@ -516,37 +586,39 @@ void code()
         { 
           if(codigo[0]==contrasena[0]&&codigo[1]==contrasena[1]&&codigo[2]==contrasena[2]&&codigo[3]==contrasena[3])  
           {
-            myDFPlayer.play(18);
             lcd1.clear();
             lcd1.setCursor(0,0);
             lcd1.print("CODIGO:");
             lcd1.setCursor(0,1);
             lcd1.print("CORRECTO");
+            myDFPlayer.play(24);
             delay(1500);
+            
             lcd1.clear();
-            myDFPlayer.play(19);
             lcd1.setCursor(4,0);
             lcd1.print("SISTEMAS");
             lcd1.setCursor(3,1);
             lcd1.print("ACTIVADOS");
+            myDFPlayer.play(25);
             delay(1500);
+
             lcd1.clear();
-            myDFPlayer.play(20);
             lcd1.setCursor(4,0);
             lcd1.print("ESPERANDO");
             lcd1.setCursor(3,1);
             lcd1.print("LANZAMIENTO");
+            myDFPlayer.play(26);
             delay(1500);
             activo=false;
           }
           else
           {
             lcd1.clear();
-            myDFPlayer.play(21);
             lcd1.setCursor(0,0);
             lcd1.print("CODIGO:");
             lcd1.setCursor(0,1);
             lcd1.print("INCORRECTO");
+            myDFPlayer.play(27);
             delay(2000);
             lcd1.clear();
             cont=0;
@@ -554,7 +626,8 @@ void code()
               
             if(n==3)
             {
-              myDFPlayer.play(22);
+              myDFPlayer.play(28);
+              delay(500);
               lcd1.setCursor(4,0);
               lcd1.print("SISTEMA");
               lcd1.setCursor(3,1);
@@ -576,11 +649,11 @@ void code()
 //establecer codigo 
 void establecer_clave()
 {
-  myDFPlayer.play(23);
   lcd1.setCursor(4,0);
   lcd1.print("INTRODUCE");
   lcd1.setCursor(2,1);
   lcd1.print("NUEVO CODIGO:");
+  myDFPlayer.play(5);
   delay(2000);
   lcd1.clear();
 
@@ -596,10 +669,8 @@ void establecer_clave()
     
     if (tecla_presionada!= NO_KEY)
     {
-      Serial.println(tecla_presionada);
-      Serial.println(cont);
-      Serial.println(contrasena[cont]);
-      
+      myDFPlayer.play(10);
+      delay(500);
       contrasena[cont]=tecla_presionada;
       
       if(cont<4)
@@ -610,7 +681,8 @@ void establecer_clave()
         
         if(cont==3)
         {
-          myDFPlayer.play(24);
+          myDFPlayer.play(6);
+          delay(500);
           lcd1.setCursor(0,0);
           lcd1.print("CONFIRMAR CODIGO");
           lcd1.setCursor(0,1);
@@ -624,11 +696,11 @@ void establecer_clave()
         if(contrasena[4]==valor[0])
         {
           lcd1.clear();
-          myDFPlayer.play(25);
           lcd1.setCursor(5,0);
           lcd1.print("CODIGO");
           lcd1.setCursor(3,1);
           lcd1.print("CONFIRMADO");
+          myDFPlayer.play(7);
           delay(2000);
           lcd1.clear();
           cont=0;
@@ -637,13 +709,13 @@ void establecer_clave()
         else if(contrasena[4]==valor1[0])
         {
           lcd1.clear();
-          myDFPlayer.play(26);
           lcd1.setCursor(0,0);
           lcd1.print("PRUEBA");
           lcd1.setCursor(0,1);
           lcd1.print("OTRA VEZ");
+          myDFPlayer.play(8);
           cont=0;
-          delay(1000);
+          delay(1500);
           lcd1.clear();
         }
         else if(contrasena[5]!=valor[0] && contrasena[5]!=valor1[0])
@@ -656,7 +728,7 @@ void establecer_clave()
 }
 
 //bara de carga
-void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrintOn, boolean fase)
+void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrintOn)
  {
     if(count<100)
     {
@@ -676,29 +748,30 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
     {
       if(digitalRead(misil)==1 && m==true)
       {
-        m=fase;
+        m=false;
       }else if (digitalRead(comb)==1 && d==true)
       {
-        d=fase;
+        d=false;
       }else if (digitalRead(chip)==1 && c==true)
       {
-        c=fase;
+        c=false;
       }      
     } 
  }
  void stop()
  {
-  myDFPlayer.play(27);
   lcd1.setCursor(6,0);
   lcd1.print("ERROR");
   lcd1.setCursor(3,1);
   lcd1.print("LANZAMIENTO");
+   myDFPlayer.play(27);
   delay(2000);
   lcd1.clear();
 
   if(digitalRead(misil)==0)
   {
     myDFPlayer.play(3);
+    delay(500);
     lcd1.setCursor(5,0);
     lcd1.print("MISIL");
     lcd1.setCursor(2,1);
@@ -706,7 +779,8 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
   }
   else if (digitalRead(comb)==0)
   {
-    myDFPlayer.play(7);
+    myDFPlayer.play(13);
+    delay(500);
     lcd1.setCursor(3,0);
     lcd1.print("COMBUSTIBLE");
     lcd1.setCursor(2,1);
@@ -714,7 +788,8 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
   }
   else if (digitalRead(chip)==0)
   {
-    myDFPlayer.play(11);
+    myDFPlayer.play(17);
+    delay(500);
     lcd1.setCursor(6,0);
     lcd1.print("CHIP");
     lcd1.setCursor(2,1);
@@ -722,7 +797,8 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
   }
   else if(digitalRead(lanzadera)==0)
   {
-    myDFPlayer.play(28);
+    myDFPlayer.play(29);
+    delay(500);
     lcd1.setCursor(4,0);
     lcd1.print("LANZADERA");
     lcd1.setCursor(2,1);
