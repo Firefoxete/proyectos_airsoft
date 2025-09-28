@@ -218,6 +218,7 @@ void loop()
             BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
+               delay(1000); 
                lcd1.clear();
                lcd1.setCursor(5,0);
                lcd1.print("MISIL");
@@ -288,6 +289,7 @@ void loop()
             BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
+               delay(1000); 
                lcd1.clear();
                lcd1.setCursor(3,0);
                lcd1.print("COMBUSTIBLE");
@@ -357,6 +359,7 @@ void loop()
             BarraDeCarga(i, 100, 1);
               if(i==100) //si tiene exito la carga
               {
+               delay(1000);  
                lcd1.clear();
                lcd1.setCursor(6,0);
                lcd1.print("CHIP");
@@ -418,9 +421,9 @@ void loop()
     else if(digitalRead(lanzadera)==0 && l==true) //tope no alcanzado
     {
       myDFPlayer.play(20);
-      delay(1500);
+      delay(500);
       
-      while(digitalRead(lanzadera)==0 && l==true)
+      while(digitalRead(lanzadera)==0 && digitalRead(chip)==1 && digitalRead(comb)==1 && digitalRead(misil)==1 && l==true)
       {
         lcd1.setCursor(5,0);
         lcd1.print("ELEVAR");
@@ -470,7 +473,7 @@ void loop()
     motor(); //apaga motor
   }
 
-  if(activo==false)
+  while(activo==false)
   {
     tiempo=millis();
     while(digitalRead(boton)==0)
@@ -486,15 +489,15 @@ void loop()
 //Funciones
 void F_regresiva()
 {
-
   lcd1.clear();
-  myDFPlayer.play(21);
+  myDFPlayer.play(27);
+  delay(500);
+  lcd1.setCursor(3,0);
+  lcd1.print("CUENTA ATRAS");
   delay(1000);
-  
+
   for(int i=0; i <= 10; i++)
   {
-    lcd1.setCursor(3,0);
-    lcd1.print("CUENTA ATRAS");
     if(i==0)
     {
       lcd1.setCursor(7,1);
@@ -507,25 +510,28 @@ void F_regresiva()
       lcd1.setCursor(8,1);
       lcd1.print(10-i);
     }
-    myDFPlayer.play(30);
+    myDFPlayer.play(31);
     delay(1000);
 
     if(i==10)
     {
+      delay(500);
       if(digitalRead(misil)==1 && digitalRead(comb)==1 && digitalRead(chip)==1 && digitalRead(lanzadera)==1)
       {
         lcd1.clear();
         digitalWrite(fuego,HIGH);
         if(i==10)
         {
-          myDFPlayer.play(22);
+          myDFPlayer.play(28);
           delay(500);
+          motor();
           while(i==10)
           {
             lcd1.setCursor(5,0);
             lcd1.print("MISIL");
             lcd1.setCursor(4,1);
             lcd1.print("LANZADO");
+            digitalWrite(led_motor,HIGH);
           }
         }
       }
@@ -556,7 +562,7 @@ void code()
   lcd1.print("INTRODUCE CODIGO");
   lcd1.setCursor(2,1);
   lcd1.print("DE ACTIVACION");
-  myDFPlayer.play(23);
+  myDFPlayer.play(21);
   delay(2000);
   lcd1.clear();
   
@@ -572,13 +578,13 @@ void code()
       if (tecla_presionada!= NO_KEY) 
       {
         myDFPlayer.play(10);
-        delay(1000);
+        delay(500);
         codigo[cont]=tecla_presionada;
         cont=cont+1;
           
         if(cont<5)
         {
-          lcd1.setCursor(cont,1);
+          lcd1.setCursor(cont-1,1);
           lcd1.print("*");
         }
           
@@ -591,7 +597,7 @@ void code()
             lcd1.print("CODIGO:");
             lcd1.setCursor(0,1);
             lcd1.print("CORRECTO");
-            myDFPlayer.play(24);
+            myDFPlayer.play(22);
             delay(1500);
             
             lcd1.clear();
@@ -599,7 +605,7 @@ void code()
             lcd1.print("SISTEMAS");
             lcd1.setCursor(3,1);
             lcd1.print("ACTIVADOS");
-            myDFPlayer.play(25);
+            myDFPlayer.play(23);
             delay(1500);
 
             lcd1.clear();
@@ -607,7 +613,7 @@ void code()
             lcd1.print("ESPERANDO");
             lcd1.setCursor(3,1);
             lcd1.print("LANZAMIENTO");
-            myDFPlayer.play(26);
+            myDFPlayer.play(24);
             delay(1500);
             activo=false;
           }
@@ -618,7 +624,7 @@ void code()
             lcd1.print("CODIGO:");
             lcd1.setCursor(0,1);
             lcd1.print("INCORRECTO");
-            myDFPlayer.play(27);
+            myDFPlayer.play(25);
             delay(2000);
             lcd1.clear();
             cont=0;
@@ -626,12 +632,17 @@ void code()
               
             if(n==3)
             {
-              myDFPlayer.play(28);
+              myDFPlayer.play(26);
               delay(500);
-              lcd1.setCursor(4,0);
-              lcd1.print("SISTEMA");
-              lcd1.setCursor(3,1);
-              lcd1.print("BROQUEADO");
+              digitalWrite(led_motor,HIGH);
+              lcd1.clear();
+              while(n==3)
+              {
+                lcd1.setCursor(4,0);
+                lcd1.print("SISTEMA");
+                lcd1.setCursor(3,1);
+                lcd1.print("BLOQUEADO");
+              }
             }  
           }
         }   
@@ -764,9 +775,10 @@ void BarraDeCarga(unsigned long count, unsigned long totalCount, int lineToPrint
   lcd1.print("ERROR");
   lcd1.setCursor(3,1);
   lcd1.print("LANZAMIENTO");
-   myDFPlayer.play(27);
+  myDFPlayer.play(30);
   delay(2000);
   lcd1.clear();
+  digitalWrite(led_motor,HIGH); //enciende el motor para bajar lanzader
 
   if(digitalRead(misil)==0)
   {
