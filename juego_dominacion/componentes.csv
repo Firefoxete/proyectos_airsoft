@@ -1,0 +1,7 @@
+﻿Nombre,Cantidad,Componente
+"U2",1," Arduino Uno R3"
+"U1",1,"Basado en PCF8574, 39 (0x27) LCD 16 x 2 (I2C)"
+"D3",1,"Verde LED"
+"R3",1,"220 Ω Resistencia"
+"S1, S3, S4",3," Pulsador"
+"PIEZO1",1," Piezo"

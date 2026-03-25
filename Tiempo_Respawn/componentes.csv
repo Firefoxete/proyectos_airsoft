@@ -1,0 +1,8 @@
+﻿Nombre,Cantidad,Componente
+"PIEZO1",1," Piezo"
+"D1",1,"Rojo LED"
+"D2",1,"Verde LED"
+"S1",1," Pulsador"
+"U2",1,"Rojo, 112 (0x70) Pantalla de reloj de 7 segmentos"
+"R1, R2",2,"220 Ω Resistencia"
+"U1",1," Arduino Uno R3"
