@@ -1,0 +1,5 @@
+﻿Nombre,Cantidad,Componente
+"PIEZO1",1," Piezo"
+"S1",1," Interruptor deslizante"
+"U2",1," ATtiny"
+"Bat1, Bat2, Bat3",3,"1 batería, AA, no Pila de 1,5 V"
